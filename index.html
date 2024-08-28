@@ -30,9 +30,11 @@
     document.body.appendChild(renderer.domElement);
 
     // Cube
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('asset/img/bedrock.png');
     function createCube(color, positionX) {
         const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({color: color});
+        const material = new THREE.MeshBasicMaterial({map: texture});
         let cube = new THREE.Mesh(geometry, material);
         cube.position.x = positionX
         return cube;
@@ -47,29 +49,24 @@
         return line;
     }
 
-    const cubes = [];
-    const edgesList = [];
-    const positionXs = [-3, 0, 3];
+    // Group
+    const group=new THREE.Group();
+    const positionXs = [-1, 0, 1];
     const colors = [0xff0000, 0x00ff00, 0x0000ff]
     positionXs.forEach((pos, index) => {
         const cube = createCube(colors[index], pos);
         const edges = createEdges(cube.geometry, pos);
-        cubes.push(cube);
-        edgesList.push(edges)
-        scene.add(cube);
-        scene.add(edges);
+        group.add(cube);
+        group.add(edges);
     });
+    scene.add(group)
 
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
 
-        cubes.forEach((cube, index) => {
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            edgesList[index].rotation.x += 0.01;
-            edgesList[index].rotation.y += 0.01;
-        })
+        group.rotation.x += 0.01;
+        group.rotation.y += 0.01;
 
         renderer.render(scene, camera);
     }
