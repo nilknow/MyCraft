@@ -16,6 +16,7 @@
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="lib/noisejs/perlin.js"></script>
 <script>
     // Scene
     const scene = new THREE.Scene();
@@ -55,23 +56,42 @@
     // Generate map
     const group = new THREE.Group();
     const mapSize = 10; // Adjust map size as needed
+    const noiseScale = 0.1; // Adjust noise scale for terrain variation
+    const noiseOctaves = 4; // Adjust noise octaves for detail level
+    const noisePersistence = 0.5; // Adjust noise persistence for smoother transitions
+    const noiseLacunarity = 2; // Adjust noise lacunarity for frequency of detail
+    function perlinNoise2D(x, y, scale, octaves, persistence, lacunarity) {
+        let noiseValue = 0;
+        let frequency = 1;
+        let amplitude = 1;
+        for (let i = 0; i < octaves; i++) {
+            noiseValue += amplitude * noise.simplex2(x * scale * frequency, y * scale * frequency);
+            frequency *= lacunarity;
+            amplitude *= persistence;
+        }
+        return noiseValue;
+    }
+
     for (let x = 0; x < mapSize; x++) {
         for (let z = 0; z < mapSize; z++) {
-            // Simple terrain generation (you can replace this with more complex logic)
+            // Generate terrain height using Perlin noise
+            const height = perlinNoise2D(x, z, noiseScale, noiseOctaves, noisePersistence, noiseLacunarity);
+
+            // Determine texture based on height
             let texture = bedrockTexture;
-            if (z > 5) {
+            if (height < 0.2) {
                 texture = sandTexture;
             }
-            if (z > 7) {
+            if (height < 0.1) {
                 texture = iceTexture;
             }
-            const cube = createCube(texture, x - mapSize / 2, z - mapSize / 2);
-            const edges = createEdges(cube.geometry, x - mapSize / 2, z - mapSize / 2);
+
+            // Create cube with appropriate texture
+            const cube = createCube(texture, x - mapSize / 2, z - mapSize / 2, height);
             group.add(cube)
-            group.add(edges)
         }
     }
-    scene.add(group)
+    scene.add(group);
 
     // Animation loop
     function animate() {
