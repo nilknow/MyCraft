@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js Cube</title>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -25,27 +30,46 @@
     document.body.appendChild(renderer.domElement);
 
     // Cube
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    function createCube(color, positionX) {
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({color: color});
+        let cube = new THREE.Mesh(geometry, material);
+        cube.position.x = positionX
+        return cube;
+    }
 
     // Edges
-    const edges = new THREE.EdgesGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
-    const line = new THREE.LineSegments(edges, lineMaterial);
-    scene.add(line);
+    function createEdges(geometry, positionX) {
+        const edges = new THREE.EdgesGeometry(geometry);
+        const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
+        const line = new THREE.LineSegments(edges, lineMaterial);
+        line.position.x = positionX
+        return line;
+    }
+
+    const cubes = [];
+    const edgesList = [];
+    const positionXs = [-3, 0, 3];
+    const colors = [0xff0000, 0x00ff00, 0x0000ff]
+    positionXs.forEach((pos, index) => {
+        const cube = createCube(colors[index], pos);
+        const edges = createEdges(cube.geometry, pos);
+        cubes.push(cube);
+        edgesList.push(edges)
+        scene.add(cube);
+        scene.add(edges);
+    });
 
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
 
-        // Rotation
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-
-        line.rotation.x = cube.rotation.x;
-        line.rotation.y = cube.rotation.y;
+        cubes.forEach((cube, index) => {
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            edgesList[index].rotation.x += 0.01;
+            edgesList[index].rotation.y += 0.01;
+        })
 
         renderer.render(scene, camera);
     }
