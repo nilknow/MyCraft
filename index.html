@@ -31,34 +31,46 @@
 
     // Cube
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('asset/img/bedrock.png');
-    function createCube(color, positionX) {
+    const bedrockTexture = textureLoader.load('asset/img/bedrock.png');
+    const iceTexture = textureLoader.load('asset/img/ice.png')
+    const sandTexture = textureLoader.load('asset/img/sand.png')
+
+    function createCube(texture, positionX, positionZ) {
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial({map: texture});
         let cube = new THREE.Mesh(geometry, material);
-        cube.position.x = positionX
+        cube.position.set(positionX, 0, positionZ)
         return cube;
     }
 
     // Edges
-    function createEdges(geometry, positionX) {
+    function createEdges(geometry, positionX, positionZ) {
         const edges = new THREE.EdgesGeometry(geometry);
         const lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
         const line = new THREE.LineSegments(edges, lineMaterial);
-        line.position.x = positionX
+        line.position.set(positionX, 0, positionZ)
         return line;
     }
 
-    // Group
-    const group=new THREE.Group();
-    const positionXs = [-1, 0, 1];
-    const colors = [0xff0000, 0x00ff00, 0x0000ff]
-    positionXs.forEach((pos, index) => {
-        const cube = createCube(colors[index], pos);
-        const edges = createEdges(cube.geometry, pos);
-        group.add(cube);
-        group.add(edges);
-    });
+    // Generate map
+    const group = new THREE.Group();
+    const mapSize = 10; // Adjust map size as needed
+    for (let x = 0; x < mapSize; x++) {
+        for (let z = 0; z < mapSize; z++) {
+            // Simple terrain generation (you can replace this with more complex logic)
+            let texture = bedrockTexture;
+            if (z > 5) {
+                texture = sandTexture;
+            }
+            if (z > 7) {
+                texture = iceTexture;
+            }
+            const cube = createCube(texture, x - mapSize / 2, z - mapSize / 2);
+            const edges = createEdges(cube.geometry, x - mapSize / 2, z - mapSize / 2);
+            group.add(cube)
+            group.add(edges)
+        }
+    }
     scene.add(group)
 
     // Animation loop

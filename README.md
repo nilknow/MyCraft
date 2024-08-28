@@ -9,4 +9,4 @@ It's widely used in Industry
 
 ## Plan
 1. Three.js implementation first
-   Day1. Cube->Cubes->Cube with material
+   Day1. Cube->Cubes->Cube with material->auto generation
