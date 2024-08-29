@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js Cube</title>
     <style>
-        body {
-            margin: 0;
-        }
+      body {
+        margin: 0;
+      }
 
-        canvas {
-            display: block;
-        }
+      canvas {
+        display: block;
+      }
     </style>
 </head>
 <body>
@@ -24,197 +24,58 @@
     </button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="lib/cannon.min.js"></script>
 <script src="lib/noisejs/perlin.js"></script>
-<script>
+<script type="module">
+    import {updatePhysics, initWorld, initGround} from "./js/cannon.js";
+    import {initMap} from "./js/map.js";
+    import {firstPersonCameraListener, topDownCameraListener, mouseControl} from "./js/control.js";
+    import {topDownCamera, firstPersonCamera, currentCamera, updateCamera} from "./js/camera.js";
+    import {player} from "./js/player.js";
+    import {directionalLight, ambientLight} from "./js/light.js"
+    import {renderer} from "./js/render.js"
     // Scene
     const scene = new THREE.Scene();
 
+    // 创建物理世界
+    let world = initWorld();
+    initGround(world)
+
     // Camera
-    const topDownCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    topDownCamera.position.set(0, 0, 5);
-    const firstPersonCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    firstPersonCamera.position.set(0, 1.6, 2.6);
-    let currentCamera = topDownCamera
     scene.add(currentCamera);
     scene.add(firstPersonCamera);
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    //light
+    scene.add(ambientLight());
+    scene.add(directionalLight());
 
-    // Cube
-    const textureLoader = new THREE.TextureLoader();
-    const bedrockTexture = textureLoader.load('asset/img/bedrock.png');
-    const iceTexture = textureLoader.load('asset/img/ice.png')
-    const sandTexture = textureLoader.load('asset/img/sand.png')
+    // 创建玩家模型
+    scene.add(player);
 
-    function createCube(texture, positionX, positionY, positionZ) {
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({map: texture});
-        let cube = new THREE.Mesh(geometry, material);
-        cube.position.set(positionX, positionY, positionZ)
-        return cube;
-    }
+    // 创建玩家物理体
+    const playerShape = new CANNON.Box(new CANNON.Vec3(1, 2, 1));
+    const playerBody = new CANNON.Body({mass: 1, shape: playerShape});
+    playerBody.position.copy(player.position);
+    world.addBody(playerBody);
 
-    // Generate map
     const group = new THREE.Group();
-    const mapSize = 100; // Adjust map size as needed
-    const noiseScale = 0.01; // Adjust noise scale for terrain variation
-    const noiseOctaves = 4; // Adjust noise octaves for detail level
-    const noisePersistence = 0.5; // Adjust noise persistence for smoother transitions
-    const noiseLacunarity = 2; // Adjust noise lacunarity for frequency of detail
-    function perlinNoise2D(x, y, scale, octaves, persistence, lacunarity) {
-        let noiseValue = 0;
-        let frequency = 1;
-        let amplitude = 1;
-        for (let i = 0; i < octaves; i++) {
-            noiseValue += amplitude * noise.simplex2(x * scale * frequency, y * scale * frequency);
-            frequency *= lacunarity;
-            amplitude *= persistence;
-        }
-        return noiseValue;
-    }
-
-    for (let x = 0; x < mapSize; x++) {
-        for (let z = 0; z < mapSize; z++) {
-            // Generate terrain height using Perlin noise
-            const noiseValue = perlinNoise2D(x, z, noiseScale, noiseOctaves, noisePersistence, noiseLacunarity);
-            // Determine texture based on height
-            let texture = bedrockTexture;
-            if (noiseValue < 0.2) {
-                texture = sandTexture;
-            }
-            if (noiseValue < 0.1) {
-                texture = iceTexture;
-            }
-
-            // Create cube with appropriate texture
-            const cube = createCube(texture, x - mapSize / 2, z - mapSize / 2, 0);
-            group.add(cube)
-            if (texture === bedrockTexture) {
-                for (let i = 0; i < noiseValue * 10; i++) {
-                    const cube = createCube(texture, x - mapSize / 2, z - mapSize / 2, i + 1);
-                    group.add(cube)
-                }
-            }
-        }
-    }
+    initMap(group)
     scene.add(group);
 
-
-    // 鼠标交互
-    let isDragging = false;
-    let previousMousePosition = {
-        x: 0,
-        y: 0
-    };
-
-    window.addEventListener('mousedown', (event) => {
-        isDragging = true;
-        previousMousePosition = {
-            x: event.clientX,
-            y: event.clientY
-        };
-    });
-
-    window.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-    window.addEventListener('mousemove', (event) => {
-        if (isDragging) {
-            const deltaX = event.clientX - previousMousePosition.x;
-            const deltaY = event.clientY - previousMousePosition.y;
-
-            // 旋转相机
-            currentCamera.rotation.y += deltaX * 0.001;
-            currentCamera.rotation.x += deltaY * 0.001;
-
-            // 更新鼠标位置
-            previousMousePosition = {
-                x: event.clientX,
-                y: event.clientY
-            };
-        }
-    });
-
-    // 相机移动速度
-    const cameraSpeed = 0.1;
-
     // 键盘事件监听
-    window.addEventListener('keypress', (event) => {
-        if (currentCamera === firstPersonCamera) {
-            return
-        }
-        const directionVector = new THREE.Vector3(); // 创建一个方向向量
-
-        switch (event.key) {
-            case 'w':
-                directionVector.copy(topDownCamera.getWorldDirection()).multiplyScalar(cameraSpeed);
-                currentCamera.position.add(directionVector);
-                break;
-            case 's':
-                directionVector.copy(topDownCamera.getWorldDirection()).multiplyScalar(-cameraSpeed);
-                currentCamera.position.add(directionVector);
-                break;
-            case 'a':
-                directionVector.copy(topDownCamera.getWorldDirection()).cross(topDownCamera.up).multiplyScalar(-cameraSpeed);
-                currentCamera.position.add(directionVector);
-                break;
-            case 'd':
-                directionVector.copy(topDownCamera.getWorldDirection()).cross(topDownCamera.up).multiplyScalar(cameraSpeed);
-                currentCamera.position.add(directionVector);
-                break;
-        }
-    });
-    window.addEventListener('keypress', (event) => {
-        if (currentCamera === topDownCamera) {
-            return
-        }
-        switch (event.key) {
-            case 'w':
-                currentCamera.position.z -= cameraSpeed;
-                break;
-            case 's': {
-                currentCamera.position.z += cameraSpeed;
-                break
-            }
-            case 'a': {
-                currentCamera.position.x -= cameraSpeed;
-                break
-            }
-            case 'd': {
-                currentCamera.position.x += cameraSpeed;
-                break
-            }
-        }
-    });
-
+    mouseControl()
+    topDownCameraListener();
+    firstPersonCameraListener()
 
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
+        updatePhysics(world, player)
+        updateCamera()
         renderer.render(scene, currentCamera);
     }
 
     animate();
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        renderer.setSize(width, height);
-        currentCamera.aspect = width / height;
-        currentCamera.updateProjectionMatrix();
-    });
-
-    document.getElementById('top-down-camera').onclick = () => {
-        currentCamera = topDownCamera
-    }
-    document.getElementById('first-person-camera').onclick = () => {
-        currentCamera = firstPersonCamera
-    }
 </script>
 </body>
 </html>
