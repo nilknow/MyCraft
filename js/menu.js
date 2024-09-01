@@ -1,10 +1,14 @@
-import {currentCamera, firstPersonCamera, topDownCamera} from "./camera.js";
+import {currentCamera, firstPersonCamera, topDownCamera, topCamera, replaceCamera} from "./camera.js";
 
 document.getElementById('top-down-camera').onclick = () => {
-    currentCamera = topDownCamera
+    replaceCamera(topDownCamera)
     console.log("top down camera")
 }
 document.getElementById('first-person-camera').onclick = () => {
-    currentCamera = firstPersonCamera
+    replaceCamera(firstPersonCamera)
     console.log("first person camera")
+}
+document.getElementById('top-camera').onclick = () => {
+    replaceCamera(topCamera)
+    console.log("top camera")
 }

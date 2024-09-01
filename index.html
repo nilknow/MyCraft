@@ -22,6 +22,12 @@
     <button id="top-down-camera">
         top down
     </button>
+    <label>
+        <input type="number" id="top-camera-input"/>
+    </label>
+    <button id="top-camera">
+        top
+    </button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="lib/cannon.min.js"></script>
@@ -34,6 +40,7 @@
     import {player} from "./js/player.js";
     import {directionalLight, ambientLight} from "./js/light.js"
     import {renderer} from "./js/render.js"
+    import "./js/menu.js"
     // Scene
     const scene = new THREE.Scene();
 
@@ -42,7 +49,7 @@
     initGround(world)
 
     // Camera
-    scene.add(currentCamera);
+    scene.add(topDownCamera);
     scene.add(firstPersonCamera);
 
     //light
