@@ -1,6 +1,7 @@
 import {perlinNoise2D} from "./noise.js";
 import {createCube} from "./cube.js";
 import {bedrockTexture, iceTexture, sandTexture} from "./texture.js";
+import * as THREE from "three";
 
 export function initMap(group){
     const mapSize = 100; // Adjust map size as needed

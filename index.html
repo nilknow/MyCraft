@@ -5,44 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js Cube</title>
     <style>
-      body {
-        margin: 0;
-      }
+        body {
+            margin: 0;
+        }
 
-      canvas {
-        display: block;
-      }
+        canvas {
+            display: block;
+        }
     </style>
 </head>
 <body>
-<div id="camera-switch" style="position: absolute">
-    <button id="first-person-camera">
-        first person
-    </button>
-    <button id="top-down-camera">
-        top down
-    </button>
-    <label>
-        <input type="number" id="top-camera-input"/>
-    </label>
-    <button id="top-camera">
-        top
-    </button>
-    <button id="left-camera">
-        left
-    </button>
-    <button id="right-camera">
-        right
-    </button>
+<div id="menu" style="position: absolute">
+    <div id="camera-switch">
+        <button id="default-camera">
+            top down
+        </button>
+        <label>
+            <input type="number" id="top-camera-input"/>
+        </label>
+        <button id="top-camera">
+            top
+        </button>
+        <button id="left-camera">
+            left
+        </button>
+        <button id="right-camera">
+            right
+        </button>
+    </div>
+    <div id="control-switch">
+        <button id="orbit-controls">orbit</button>
+        <button id="pointer-lock-controls">pointer lock</button>
+    </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.153.0/examples/jsm/"
+      }
+    }
+</script>
 <script src="lib/cannon.min.js"></script>
 <script src="lib/noisejs/perlin.js"></script>
 <script type="module">
+    import * as THREE from "three";
     import {updatePhysics, initWorld, initGround} from "./js/cannon.js";
     import {initMap} from "./js/map.js";
-    import {firstPersonCameraListener, topDownCameraListener, mouseControl} from "./js/control.js";
-    import {topDownCamera, firstPersonCamera, currentCamera, updateCamera,replaceCamera} from "./js/camera.js";
+    import {currentCamera} from "./js/camera.js";
     import {player} from "./js/player.js";
     import {directionalLight, ambientLight} from "./js/light.js"
     import {renderer} from "./js/render.js"
@@ -53,10 +64,6 @@
     // 创建物理世界
     let world = initWorld();
     initGround(world)
-
-    // Camera
-    scene.add(topDownCamera);
-    scene.add(firstPersonCamera);
 
     //light
     scene.add(ambientLight());
@@ -75,16 +82,10 @@
     initMap(group)
     scene.add(group);
 
-    // 键盘事件监听
-    mouseControl()
-    topDownCameraListener();
-    firstPersonCameraListener()
-
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
-        updatePhysics(world, player)
-        updateCamera()
+        updatePhysics(world, player, playerBody)
         renderer.render(scene, currentCamera);
     }
 

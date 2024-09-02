@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export function createCube(texture, positionX, positionY, positionZ) {
     const geometry = new THREE.BoxGeometry();
     const material = new THREE.MeshBasicMaterial({map: texture});

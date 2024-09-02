@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export function ambientLight() {
     return new THREE.AmbientLight(0xffffff, 0.5);
 }

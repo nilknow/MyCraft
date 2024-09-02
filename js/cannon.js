@@ -1,9 +1,9 @@
-export function updatePhysics(world,player) {
+export function updatePhysics(world,player,playerBody) {
     world.step(1 / 60); // 更新物理世界
 
     // 更新玩家模型位置
-    player.position.copy(player.position);
-    player.quaternion.copy(player.quaternion);
+    player.position.copy(playerBody.position);
+    player.quaternion.copy(playerBody.quaternion);
 }
 
 export function initWorld(){
