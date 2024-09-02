@@ -28,6 +28,12 @@
     <button id="top-camera">
         top
     </button>
+    <button id="left-camera">
+        left
+    </button>
+    <button id="right-camera">
+        right
+    </button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="lib/cannon.min.js"></script>
@@ -36,7 +42,7 @@
     import {updatePhysics, initWorld, initGround} from "./js/cannon.js";
     import {initMap} from "./js/map.js";
     import {firstPersonCameraListener, topDownCameraListener, mouseControl} from "./js/control.js";
-    import {topDownCamera, firstPersonCamera, currentCamera, updateCamera} from "./js/camera.js";
+    import {topDownCamera, firstPersonCamera, currentCamera, updateCamera,replaceCamera} from "./js/camera.js";
     import {player} from "./js/player.js";
     import {directionalLight, ambientLight} from "./js/light.js"
     import {renderer} from "./js/render.js"

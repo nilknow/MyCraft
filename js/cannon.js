@@ -3,7 +3,7 @@ export function updatePhysics(world,player) {
 
     // 更新玩家模型位置
     player.position.copy(player.position);
-    player.quaternion.copy(player.position);
+    player.quaternion.copy(player.quaternion);
 }
 
 export function initWorld(){
