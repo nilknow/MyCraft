@@ -61,4 +61,5 @@ export function updateMovement() {
     if (moveRight) vector.copy(camera.getWorldDirection(vector)).cross(camera.up).multiplyScalar(speed);
 
     setVelocity(vector)
+    camera.position.copy(playerBody.position)
 }
