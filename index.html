@@ -53,10 +53,11 @@
     import * as THREE from "three";
     import {updatePhysics, initWorld, initGround} from "./js/cannon.js";
     import {initMap} from "./js/map.js";
-    import {currentCamera} from "./js/camera.js";
+    import {camera} from "./js/camera.js";
     import {player} from "./js/player.js";
     import {directionalLight, ambientLight} from "./js/light.js"
     import {renderer} from "./js/render.js"
+    import {updateMovement} from "./js/control.js";
     import "./js/menu.js"
     // Scene
     const scene = new THREE.Scene();
@@ -86,7 +87,8 @@
     function animate() {
         requestAnimationFrame(animate);
         updatePhysics(world, player, playerBody)
-        renderer.render(scene, currentCamera);
+        updateMovement()
+        renderer.render(scene, camera);
     }
 
     animate();

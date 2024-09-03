@@ -15,10 +15,10 @@ export const rightCamera = new THREE.OrthographicCamera(-window.innerWidth / 20,
 rightCamera.position.set(0, 0, 100)
 rightCamera.lookAt(0, 0, 0)
 
-export let currentCamera = defaultCamera
+export let camera = defaultCamera
 
-export function replaceCamera(camera) {
-    currentCamera = camera
+export function replaceCamera(newCamera) {
+    camera = newCamera
     if (camera === topCamera) {
         let value = document.getElementById("top-camera-input").value;
         if (value) {

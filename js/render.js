@@ -1,4 +1,4 @@
-import {currentCamera} from "./camera.js";
+import {camera} from "./camera.js";
 import * as THREE from "three";
 
 export const renderer = new THREE.WebGLRenderer();
@@ -9,6 +9,6 @@ window.addEventListener('resize', () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     renderer.setSize(width, height);
-    currentCamera.aspect = width / height;
-    currentCamera.updateProjectionMatrix();
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
 });

@@ -1,5 +1,5 @@
 import {
-    currentCamera,
+    camera,
     defaultCamera,
     topCamera,
     leftCamera,
@@ -30,8 +30,8 @@ document.getElementById('right-camera').onclick = () => {
     console.log("right camera")
 }
 
-const orbitControls=new OrbitControls(currentCamera, renderer.domElement);
-const pointerLockControls=new PointerLockControls(currentCamera, document.body);
+const orbitControls=new OrbitControls(camera, renderer.domElement);
+const pointerLockControls=new PointerLockControls(camera, document.body);
 document.getElementById('orbit-controls').onclick=()=>{
     orbitControls.enabled = true;
     pointerLockControls.enabled=false
