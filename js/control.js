@@ -1,6 +1,8 @@
 // Movement variables
 import {camera} from "./camera.js";
+import {playerBody} from './cannon.js'
 import * as THREE from 'three'
+import {player} from "./player.js";
 
 let moveForward = false;
 let moveBackward = false;
@@ -8,11 +10,10 @@ let moveLeft = false;
 let moveRight = false;
 let vector = new THREE.Vector3();
 // Movement speed
-const speed = 0.2;
+const speed = 2;
 
 // Event listeners for WASD keys
 document.addEventListener('keydown', (event) => {
-    console.log(event.code)
     switch (event.code) {
         case 'KeyW':
             moveForward = true;
@@ -46,6 +47,11 @@ document.addEventListener('keyup', (event) => {
     }
 });
 
+function setVelocity(direction) {
+    const velocity = new CANNON.Vec3(...direction);
+    playerBody.velocity.set(velocity.x, velocity.y, velocity.z);
+}
+
 export function updateMovement() {
     vector.set(0, 0, 0);
 
@@ -54,6 +60,5 @@ export function updateMovement() {
     if (moveLeft) vector.copy(camera.getWorldDirection(vector)).cross(camera.up).multiplyScalar(-speed);
     if (moveRight) vector.copy(camera.getWorldDirection(vector)).cross(camera.up).multiplyScalar(speed);
 
-    // Apply movement to camera position
-    camera.position.add(vector);
+    setVelocity(vector)
 }

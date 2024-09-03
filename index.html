@@ -51,7 +51,7 @@
 <script src="lib/noisejs/perlin.js"></script>
 <script type="module">
     import * as THREE from "three";
-    import {updatePhysics, initWorld, initGround} from "./js/cannon.js";
+    import {updatePhysics, initWorld, initGround, initPlayerBody, playerBody} from "./js/cannon.js";
     import {initMap} from "./js/map.js";
     import {camera} from "./js/camera.js";
     import {player} from "./js/player.js";
@@ -64,7 +64,8 @@
 
     // 创建物理世界
     let world = initWorld();
-    initGround(world)
+    let ground = initGround();
+    world.addBody(ground);
 
     //light
     scene.add(ambientLight());
@@ -74,8 +75,7 @@
     scene.add(player);
 
     // 创建玩家物理体
-    const playerShape = new CANNON.Box(new CANNON.Vec3(1, 2, 1));
-    const playerBody = new CANNON.Body({mass: 1, shape: playerShape});
+    initPlayerBody();
     playerBody.position.copy(player.position);
     world.addBody(playerBody);
 
